@@ -1,6 +1,6 @@
 package com.projetos.emprestimo.exception;
 
-public record ErroResposta(Long equipamentoId, Long colaboradorId) {
+public record ErroResposta(String mensagem) {
 
 
 }

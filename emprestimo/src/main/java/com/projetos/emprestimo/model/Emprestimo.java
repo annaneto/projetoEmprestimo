@@ -28,7 +28,7 @@ public class Emprestimo {
     private LocalDate dataDevolucao;
 
     public boolean estaAtrasado(){
-        return dataDevolucao == null && dataPrevistaDevolucao.isBefore(LocalDateTime.now());
+        return dataDevolucao == null && dataPrevistaDevolucao.isBefore(LocalDate.now());
     }
 
 }

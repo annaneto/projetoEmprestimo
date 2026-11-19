@@ -20,7 +20,7 @@ public class Colaborador {
     @Column(nullable = false)
     private String email;
 
-    @NotBlank(message =  = "O CEP do colaborador é obrigatório")
+    @NotBlank(message =  "O CEP do colaborador é obrigatório")
     @Pattern(regexp = "\\d{8}", message = "O CEP deve ter 8 dígitos, sem traço")
     @Column(nullable = false)
     private String cep;
