@@ -1,4 +1,4 @@
-package com.exception;
+package com.projetos.emprestimo.exception;
 
 
 import org.springframework.http.HttpStatus;
