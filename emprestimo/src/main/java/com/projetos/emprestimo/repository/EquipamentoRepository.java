@@ -9,6 +9,8 @@ public interface EquipamentoRepository extends JpaRepository<Equipamento, Long> 
 
     boolean existsByPatrimonio(String patrimonio);
 
+
+
     List<Equipamento> findByTipo(TipoEquipamento tipo);
 
     List<Equipamento> findByDisponivel(TipoEquipamento tipo);
