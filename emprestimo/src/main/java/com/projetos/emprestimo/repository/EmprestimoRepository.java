@@ -7,9 +7,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface EmprestimoRepository extends JpaRepository <Emprestimo, Long>{
-    boolean existByEquipamento(Long equipamentoId);
+    boolean existsByEquipamentoId(Long equipamentoId);
 
     List<Emprestimo> findByColaboradorId(Long colaboradorId);
 
-    List<Emprestimo> findByDataDevolucaoIsNullAndDataPrevistaDevolucaoBefora(LocalDate data);
+    List<Emprestimo> findByDataDevolucaoIsNullAndDataPrevistaDevolucaoBefore(LocalDate data);
 }
