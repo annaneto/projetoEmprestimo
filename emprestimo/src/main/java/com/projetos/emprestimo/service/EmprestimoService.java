@@ -8,10 +8,12 @@ import com.projetos.emprestimo.model.Emprestimo;
 import com.projetos.emprestimo.model.Equipamento;
 import com.projetos.emprestimo.repository.EmprestimoRepository;
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Service
 public class EmprestimoService {
     private final EmprestimoRepository repository;
     private final ColaboradorService colaboradorService;
