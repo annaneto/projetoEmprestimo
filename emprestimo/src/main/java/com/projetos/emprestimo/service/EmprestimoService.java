@@ -20,10 +20,10 @@ public class EmprestimoService {
     private final EquipamentoService equipamentoService;
     private static final int PRAZO_EM_DIAS = 14;
 
-    public EmprestimoService(EmprestimoRepository repository, ColaboradorService colaboradorSerivice,
+    public EmprestimoService(EmprestimoRepository repository, ColaboradorService colaboradorService,
                              EquipamentoService equipamentoService){
         this.repository = repository;
-        this.colaboradorService = colaboradorSerivice;
+        this.colaboradorService = colaboradorService;
         this.equipamentoService = equipamentoService;
     }
     public Emprestimo buscar(Long id){
@@ -43,6 +43,13 @@ public class EmprestimoService {
         if(!equipamento.isDisponivel()){
             throw new ConflitoException("Equipamento indisponível");
         }
+
+        List<Emprestimo> emprestimosColaborador = repository.findByColaboradorId(pedido.colaboradorId());
+        boolean temAtraso = emprestimosColaborador.stream().anyMatch(Emprestimo::estaAtrasado);
+        if (temAtraso) {
+            throw new ConflitoException("Colaborador possui empréstimo em atraso e não pode realizar novos empréstimos");
+        }
+
         equipamento.setDisponivel(false);
 
         Emprestimo emprestimo = new Emprestimo();
@@ -54,10 +61,11 @@ public class EmprestimoService {
 
     }
 
+    @Transactional
     public Emprestimo devolver(Long id){
         Emprestimo emprestimo = buscar(id);
         if(emprestimo.getDataDevolucao() != null){
-            throw new ConflitoException("Está devolvido");
+            throw new ConflitoException("Empréstimo já foi devolvido");
         }
         emprestimo.setDataDevolucao(LocalDate.now());
         emprestimo.getEquipamento().setDisponivel(true);

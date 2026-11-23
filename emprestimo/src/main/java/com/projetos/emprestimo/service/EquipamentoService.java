@@ -1,16 +1,14 @@
 package com.projetos.emprestimo.service;
 
 import com.projetos.emprestimo.exception.ConflitoException;
+import com.projetos.emprestimo.exception.NaoEncontradoException;
 import com.projetos.emprestimo.model.Equipamento;
 import com.projetos.emprestimo.model.TipoEquipamento;
 import com.projetos.emprestimo.repository.EmprestimoRepository;
 import com.projetos.emprestimo.repository.EquipamentoRepository;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-
 
 @Service
 public class EquipamentoService {
@@ -24,55 +22,48 @@ public class EquipamentoService {
     }
 
     public List<Equipamento> listar(TipoEquipamento tipo) {
-        if (tipo == null) {
-            return repository.findAll();
+        return listar(tipo, null);
+    }
+
+    public List<Equipamento> listar(TipoEquipamento tipo, Boolean disponivel) {
+        if (tipo != null && disponivel != null) {
+            return repository.findByTipoAndDisponivel(tipo, disponivel);
         }
-        return repository.findByTipo(tipo);
+        if (tipo != null) {
+            return repository.findByTipo(tipo);
+        }
+        if (disponivel != null) {
+            return repository.findByDisponivel(disponivel);
+        }
+        return repository.findAll();
     }
 
     public Equipamento buscar(Long id) {
         return repository.findById(id).orElseThrow(() ->
-                new ResponseStatusException(HttpStatus.NOT_FOUND, "Equipamento não encontrado")
+                new NaoEncontradoException("Equipamento não encontrado")
         );
     }
 
     public Equipamento cadastrar(Equipamento equipamento) {
         if (repository.existsByPatrimonio(equipamento.getPatrimonio())) {
-            throw new ResponseStatusException(
-                    HttpStatus.CONFLICT, "Patrimônio já cadastrado"
-            );
+            throw new ConflitoException("Patrimônio já cadastrado");
         }
-        equipamento.setDisponivel(true); // todo equipamento novo nasce disponível
+        equipamento.setDisponivel(true);
         return repository.save(equipamento);
     }
 
-    public Equipamento atualizar(Long id, Equipamento dados){
+    public Equipamento atualizar(Long id, Equipamento dados) {
         Equipamento equipamento = buscar(id);
         equipamento.setNome(dados.getNome());
         equipamento.setTipo(dados.getTipo());
         return repository.save(equipamento);
     }
 
-    public void remover(Long id){
-       Equipamento equipamento = buscar(id);
-       if(emprestimoRepository.existsByEquipamentoId(id)){
-           throw new ConflitoException("Equipamento já tem empréstimos registrados");
-       }
-       repository.delete(equipamento);
+    public void remover(Long id) {
+        Equipamento equipamento = buscar(id);
+        if (emprestimoRepository.existsByEquipamentoId(id)) {
+            throw new ConflitoException("Equipamento já tem empréstimos registrados");
+        }
+        repository.delete(equipamento);
     }
-    public List<Equipamento> Listar(TipoEquipamento tipo, Boolean disponivel){
-        if(tipo != null && disponivel != null){
-            return repository.findByTipoAndDisponivel(tipo, disponivel);
-        }
-        if(tipo != null){
-            return repository.findByTipo(tipo);
-        }
-        if(disponivel != null){
-            return repository.findByDisponivel(disponivel);
-        }
-        return repository.findAll();
-    }
-
-
-
 }

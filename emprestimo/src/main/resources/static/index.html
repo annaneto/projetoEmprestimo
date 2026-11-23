@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema de Empréstimos — Gestão de Equipamentos</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Container de Notificações -->
+  <div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+  <!-- Header Minimalista -->
+  <header class="site-header">
+    <div class="container header-content">
+      <div class="brand">
+        <span class="brand-tag">TI / HARDWARE</span>
+        <h1 class="brand-name">Gestão de Equipamentos</h1>
+      </div>
+
+      <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab active" data-tab="emprestimos" role="tab">Empréstimos</button>
+        <button class="nav-tab" data-tab="equipamentos" role="tab">Equipamentos</button>
+        <button class="nav-tab" data-tab="colaboradores" role="tab">Colaboradores</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container page-content">
+    <!-- Métricas / Indicadores (Estilo Editorial Monocromático) -->
+    <section class="metrics-row">
+      <div class="metric-block">
+        <span class="metric-label">Equipamentos Totais</span>
+        <span id="kpi-total-equip" class="metric-value">0</span>
+      </div>
+      <div class="metric-block">
+        <span class="metric-label">Disponíveis</span>
+        <span id="kpi-available-equip" class="metric-value">0</span>
+      </div>
+      <div class="metric-block">
+        <span class="metric-label">Empréstimos Ativos</span>
+        <span id="kpi-active-loans" class="metric-value">0</span>
+      </div>
+      <div class="metric-block metric-alert">
+        <span class="metric-label">Empréstimos em Atraso</span>
+        <span id="kpi-delayed-loans" class="metric-value">0</span>
+      </div>
+    </section>
+
+    <!-- ABA 1: Empréstimos -->
+    <section id="view-emprestimos" class="tab-view active">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Empréstimos</h2>
+          <label class="checkbox-filter">
+            <input type="checkbox" id="filter-atrasados">
+            <span>Apenas pendências em atraso</span>
+          </label>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-dark" onclick="openModal('modal-emprestimo')">+ Novo Empréstimo</button>
+        </div>
+      </div>
+
+      <div class="data-wrapper">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th style="width: 70px;">ID</th>
+              <th>Equipamento</th>
+              <th>Colaborador</th>
+              <th>Empréstimo</th>
+              <th>Previsão</th>
+              <th>Status</th>
+              <th class="col-action">Ação</th>
+            </tr>
+          </thead>
+          <tbody id="emprestimos-tbody">
+            <tr><td colspan="7" class="empty-state">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABA 2: Equipamentos -->
+    <section id="view-equipamentos" class="tab-view">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Equipamentos</h2>
+          <div class="filters-group">
+            <select id="filter-equip-tipo" class="select-filter" onchange="loadEquipamentos()">
+              <option value="">Tipo: Todos</option>
+              <option value="NOTEBOOK">Notebook</option>
+              <option value="MONITOR">Monitor</option>
+              <option value="TECLADO">Teclado</option>
+              <option value="MOUSE">Mouse</option>
+              <option value="HEADSET">Headset</option>
+              <option value="OUTRO">Outro</option>
+            </select>
+            <select id="filter-equip-disp" class="select-filter" onchange="loadEquipamentos()">
+              <option value="">Status: Todos</option>
+              <option value="true">Disponíveis</option>
+              <option value="false">Emprestados</option>
+            </select>
+          </div>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-dark" onclick="openModal('modal-equipamento')">+ Novo Equipamento</button>
+        </div>
+      </div>
+
+      <div class="data-wrapper">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th style="width: 130px;">Patrimônio</th>
+              <th>Nome / Modelo</th>
+              <th style="width: 140px;">Tipo</th>
+              <th style="width: 120px;">Situação</th>
+              <th class="col-action" style="width: 150px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="equipamentos-tbody">
+            <tr><td colspan="5" class="empty-state">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ABA 3: Colaboradores -->
+    <section id="view-colaboradores" class="tab-view">
+      <div class="section-toolbar">
+        <div class="toolbar-left">
+          <h2 class="section-title">Colaboradores</h2>
+        </div>
+        <div class="toolbar-right">
+          <button class="btn btn-dark" onclick="openModal('modal-colaborador')">+ Novo Colaborador</button>
+        </div>
+      </div>
+
+      <div class="data-wrapper">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>CEP</th>
+              <th>Endereço Completo</th>
+              <th class="col-action" style="width: 220px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="colaboradores-tbody">
+            <tr><td colspan="5" class="empty-state">Carregando dados...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <!-- MODAL: Novo Empréstimo -->
+  <div id="modal-emprestimo" class="modal-root">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>Registrar Empréstimo</h3>
+        <button class="btn-close" onclick="closeModal('modal-emprestimo')" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="form-emprestimo" onsubmit="handleSalvarEmprestimo(event)">
+        <div class="modal-body">
+          <div class="field">
+            <label for="select-equipamento">Equipamento Disponível</label>
+            <select id="select-equipamento" class="input-field" required>
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="select-colaborador">Colaborador</label>
+            <select id="select-colaborador" class="input-field" required>
+              <option value="">Selecione...</option>
+            </select>
+          </div>
+          <p class="field-help">Prazo de devolução fixado pelo sistema: 14 dias corridos.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" onclick="closeModal('modal-emprestimo')">Cancelar</button>
+          <button type="submit" class="btn btn-dark" id="btn-submit-emprestimo">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Equipamento (Novo / Edição) -->
+  <div id="modal-equipamento" class="modal-root">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-equipamento-title">Novo Equipamento</h3>
+        <button class="btn-close" onclick="closeModal('modal-equipamento')" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="form-equipamento" onsubmit="handleSalvarEquipamento(event)">
+        <input type="hidden" id="equipamento-id">
+        <div class="modal-body">
+          <div class="field">
+            <label for="equipamento-patrimonio">Código de Patrimônio</label>
+            <input type="text" id="equipamento-patrimonio" class="input-field" placeholder="Ex: PAT-0100" required>
+          </div>
+          <div class="field">
+            <label for="equipamento-nome">Nome / Modelo</label>
+            <input type="text" id="equipamento-nome" class="input-field" placeholder="Ex: Dell Latitude 5430" required>
+          </div>
+          <div class="field">
+            <label for="equipamento-tipo">Tipo</label>
+            <select id="equipamento-tipo" class="input-field" required>
+              <option value="NOTEBOOK">NOTEBOOK</option>
+              <option value="MONITOR">MONITOR</option>
+              <option value="TECLADO">TECLADO</option>
+              <option value="MOUSE">MOUSE</option>
+              <option value="HEADSET">HEADSET</option>
+              <option value="OUTRO">OUTRO</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" onclick="closeModal('modal-equipamento')">Cancelar</button>
+          <button type="submit" class="btn btn-dark" id="btn-submit-equipamento">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Colaborador (Novo / Edição) -->
+  <div id="modal-colaborador" class="modal-root">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modal-colaborador-title">Novo Colaborador</h3>
+        <button class="btn-close" onclick="closeModal('modal-colaborador')" aria-label="Fechar">&times;</button>
+      </div>
+      <form id="form-colaborador" onsubmit="handleSalvarColaborador(event)">
+        <input type="hidden" id="colaborador-id">
+        <div class="modal-body">
+          <div class="field">
+            <label for="colaborador-nome">Nome Completo</label>
+            <input type="text" id="colaborador-nome" class="input-field" required>
+          </div>
+          <div class="field">
+            <label for="colaborador-email">E-mail</label>
+            <input type="email" id="colaborador-email" class="input-field" required>
+          </div>
+          <div class="field-grid-2">
+            <div class="field">
+              <label for="colaborador-cep">CEP</label>
+              <div class="input-inline-btn">
+                <input type="text" id="colaborador-cep" class="input-field" maxlength="9" placeholder="00000000" required>
+                <button type="button" class="btn btn-light btn-compact" onclick="buscarCep()">Buscar</button>
+              </div>
+            </div>
+            <div class="field">
+              <label for="colaborador-numero">Número</label>
+              <input type="text" id="colaborador-numero" class="input-field" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="colaborador-logradouro">Logradouro</label>
+            <input type="text" id="colaborador-logradouro" class="input-field">
+          </div>
+          <div class="field-grid-3">
+            <div class="field" style="grid-column: span 2;">
+              <label for="colaborador-bairro">Bairro</label>
+              <input type="text" id="colaborador-bairro" class="input-field">
+            </div>
+            <div class="field">
+              <label for="colaborador-uf">UF</label>
+              <input type="text" id="colaborador-uf" class="input-field" maxlength="2" placeholder="SP">
+            </div>
+          </div>
+          <div class="field">
+            <label for="colaborador-cidade">Cidade</label>
+            <input type="text" id="colaborador-cidade" class="input-field">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-light" onclick="closeModal('modal-colaborador')">Cancelar</button>
+          <button type="submit" class="btn btn-dark" id="btn-submit-colaborador">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Histórico de Empréstimos -->
+  <div id="modal-historico" class="modal-root">
+    <div class="modal-box modal-wide">
+      <div class="modal-header">
+        <div>
+          <h3>Histórico de Empréstimos</h3>
+          <span id="historico-colaborador-nome" class="sub-text"></span>
+        </div>
+        <button class="btn-close" onclick="closeModal('modal-historico')" aria-label="Fechar">&times;</button>
+      </div>
+      <div class="modal-body">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th style="width: 60px;">ID</th>
+              <th>Equipamento</th>
+              <th>Empréstimo</th>
+              <th>Previsão</th>
+              <th>Devolução</th>
+              <th>Situação</th>
+            </tr>
+          </thead>
+          <tbody id="historico-tbody">
+            <tr><td colspan="6" class="empty-state">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-light" onclick="closeModal('modal-historico')">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container footer-content">
+      <span>Sistema Interno de Empréstimos &bull; TI</span>
+      <div class="footer-links">
+        <a href="/swagger-ui/index.html" target="_blank" rel="noopener">Swagger</a>
+        <a href="/h2-console" target="_blank" rel="noopener">H2 Console</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+</body>
+</html>

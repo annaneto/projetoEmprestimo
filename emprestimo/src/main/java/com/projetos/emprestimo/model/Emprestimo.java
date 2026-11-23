@@ -31,6 +31,14 @@ public class Emprestimo {
         return dataDevolucao == null && dataPrevistaDevolucao.isBefore(LocalDate.now());
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
     public Equipamento getEquipamento() {
         return equipamento;
     }

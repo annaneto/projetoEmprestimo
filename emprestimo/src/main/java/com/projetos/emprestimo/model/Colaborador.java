@@ -9,34 +9,36 @@ public class Colaborador {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotBlank(message = "O nome do colaborador é obrigatório")
     @Column(nullable = false)
     private String nome;
 
-    @NotBlank(message = "O e-mai do colaborador é obrigatório")
+    @NotBlank(message = "O e-mail do colaborador é obrigatório")
     @Email
     @Column(nullable = false)
     private String email;
 
-    @NotBlank(message =  "O CEP do colaborador é obrigatório")
+    @NotBlank(message = "O CEP do colaborador é obrigatório")
     @Pattern(regexp = "\\d{8}", message = "O CEP deve ter 8 dígitos, sem traço")
     @Column(nullable = false)
     private String cep;
 
     @NotBlank(message = "O número é obrigatório")
     @Column(nullable = false)
-    public String numero;
+    private String numero;
 
-    // aqui vai ter o endereço
+    private String logradouro;
+    private String bairro;
+    private String cidade;
+    private String uf;
 
-
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -70,5 +72,37 @@ public class Colaborador {
 
     public void setNumero(String numero) {
         this.numero = numero;
+    }
+
+    public String getLogradouro() {
+        return logradouro;
+    }
+
+    public void setLogradouro(String logradouro) {
+        this.logradouro = logradouro;
+    }
+
+    public String getBairro() {
+        return bairro;
+    }
+
+    public void setBairro(String bairro) {
+        this.bairro = bairro;
+    }
+
+    public String getCidade() {
+        return cidade;
+    }
+
+    public void setCidade(String cidade) {
+        this.cidade = cidade;
+    }
+
+    public String getUf() {
+        return uf;
+    }
+
+    public void setUf(String uf) {
+        this.uf = uf;
     }
 }

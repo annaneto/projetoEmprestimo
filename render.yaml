@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: emprestimo-api
+    runtime: docker
+    plan: free
+    region: ohio
+    branch: main
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 8080
