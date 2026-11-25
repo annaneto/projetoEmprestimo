@@ -2,7 +2,7 @@
 
 API REST desenvolvida em **Java 25** com **Spring Boot 4.1.2** para gerenciamento e controle de empréstimos de equipamentos de TI para colaboradores.
 
-- **Deploy (Render):** https://projetoEmprestimo.onrender.com
+- **Deploy (Render):** https://projetoemprestimo-i7aa.onrender.com/
 
 ## Tecnologias Utilizadas
 
