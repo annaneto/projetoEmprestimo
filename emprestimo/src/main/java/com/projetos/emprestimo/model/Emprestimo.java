@@ -27,8 +27,33 @@ public class Emprestimo {
 
     private LocalDate dataDevolucao;
 
-    public boolean estaAtrasado(){
-        return dataDevolucao == null && dataPrevistaDevolucao.isBefore(LocalDate.now());
+    public Emprestimo() {
+    }
+
+    public Emprestimo(Equipamento equipamento, Colaborador colaborador, LocalDate hoje) {
+        this.equipamento = equipamento;
+        this.colaborador = colaborador;
+        this.dataEmprestimo = hoje;
+        this.dataPrevistaDevolucao = hoje.plusDays(14);
+    }
+
+    public void devolver(LocalDate data) {
+        if (this.dataDevolucao != null) {
+            throw new IllegalStateException("Empréstimo já devolvido");
+        }
+        this.dataDevolucao = data;
+    }
+
+    public boolean estaAtrasadoEm(LocalDate data) {
+        return this.dataDevolucao == null && this.dataPrevistaDevolucao.isBefore(data);
+    }
+
+    public boolean isAtrasado() {
+        return estaAtrasadoEm(LocalDate.now());
+    }
+
+    public boolean estaAtrasado() {
+        return isAtrasado();
     }
 
     public Long getId() {

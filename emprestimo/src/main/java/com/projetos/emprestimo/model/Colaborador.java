@@ -17,19 +17,17 @@ public class Colaborador {
 
     @NotBlank(message = "O e-mail do colaborador é obrigatório")
     @Email
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @NotBlank(message = "O CEP do colaborador é obrigatório")
+    private String cargo;
+
+    // endereço (vai que o funcionario não devolve e a gente precisa ir lá buscar o equipamento)
+
     @Pattern(regexp = "\\d{8}", message = "O CEP deve ter 8 dígitos, sem traço")
-    @Column(nullable = false)
     private String cep;
 
-    @NotBlank(message = "O número é obrigatório")
-    @Column(nullable = false)
     private String numero;
-
-    private String logradouro;
     private String bairro;
     private String cidade;
     private String uf;
@@ -58,6 +56,10 @@ public class Colaborador {
         this.email = email;
     }
 
+    public String getCargo() {return cargo;}
+
+    public void setCargo(String cargo) {this.cargo = cargo;}
+
     public String getCep() {
         return cep;
     }
@@ -74,13 +76,6 @@ public class Colaborador {
         this.numero = numero;
     }
 
-    public String getLogradouro() {
-        return logradouro;
-    }
-
-    public void setLogradouro(String logradouro) {
-        this.logradouro = logradouro;
-    }
 
     public String getBairro() {
         return bairro;

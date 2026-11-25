@@ -41,9 +41,9 @@ public class ColaboradorService {
         }
         colaborador.setNome(dados.getNome());
         colaborador.setEmail(dados.getEmail());
+        colaborador.setCargo(dados.getCargo());
         colaborador.setCep(dados.getCep());
         colaborador.setNumero(dados.getNumero());
-        colaborador.setLogradouro(dados.getLogradouro());
         colaborador.setBairro(dados.getBairro());
         colaborador.setCidade(dados.getCidade());
         colaborador.setUf(dados.getUf());

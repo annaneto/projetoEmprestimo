@@ -68,4 +68,15 @@ public boolean isDisponivel() {
 public void setDisponivel(boolean disponivel) {
     this.disponivel = disponivel;
 }
+
+public void emprestar() {
+    if (!this.disponivel) {
+        throw new IllegalStateException("Equipamento indisponível");
+    }
+    this.disponivel = false;
+}
+
+public void devolver() {
+    this.disponivel = true;
+}
 }

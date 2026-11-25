@@ -34,6 +34,14 @@ public class EmprestimoController {
         return service.emprestar(pedido);
     }
 
+    @PostMapping(params = {"equipamentoId", "colaboradorId"})
+    // @ResponseStatus(HttpStatus.CREATED)
+    // public Emprestimo emprestarPorParametros(
+    //         @RequestParam Long equipamentoId,
+    //         @RequestParam Long colaboradorId) {
+    //     return service.emprestar(new EmprestimoRequest(equipamentoId, colaboradorId));
+    // }
+
     @PutMapping("/{id}/devolucao")
     public Emprestimo devolver(@PathVariable Long id) {
         return service.devolver(id);

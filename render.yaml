@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: emprestimo-api
+    name: projeto-emprestimo-elastech-api
     runtime: docker
     plan: free
     region: ohio
