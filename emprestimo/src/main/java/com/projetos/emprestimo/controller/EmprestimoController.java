@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = {"/emprestimos", "/emprestimo"})
+@RequestMapping(path = { "/emprestimos", "/emprestimo" })
 public class EmprestimoController {
     private final EmprestimoService service;
 
@@ -34,13 +34,13 @@ public class EmprestimoController {
         return service.emprestar(pedido);
     }
 
-    @PostMapping(params = {"equipamentoId", "colaboradorId"})
-    // @ResponseStatus(HttpStatus.CREATED)
-    // public Emprestimo emprestarPorParametros(
-    //         @RequestParam Long equipamentoId,
-    //         @RequestParam Long colaboradorId) {
-    //     return service.emprestar(new EmprestimoRequest(equipamentoId, colaboradorId));
-    // }
+    @PostMapping(params = { "equipamentoId", "colaboradorId" })
+    @ResponseStatus(HttpStatus.CREATED)
+    public Emprestimo emprestarPorParametros(
+            @RequestParam Long equipamentoId,
+            @RequestParam Long colaboradorId) {
+        return service.emprestar(new EmprestimoRequest(equipamentoId, colaboradorId));
+    }
 
     @PutMapping("/{id}/devolucao")
     public Emprestimo devolver(@PathVariable Long id) {
