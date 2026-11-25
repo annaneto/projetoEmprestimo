@@ -1,5 +1,5 @@
 /* ==========================================================
-   EquipTrack — Lógica do Cliente (Interface Monocromática)
+   Gestão de Equipamentos — Lógica do Cliente Frontend
    ========================================================== */
 
 const API_BASE = window.location.origin;
@@ -117,7 +117,7 @@ async function loadEmprestimos() {
 function renderEmprestimos(list) {
   const tbody = document.getElementById('emprestimos-tbody');
   if (!list.length) {
-    tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Nenhum registro encontrado.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="7" class="empty-state">Nenhum empréstimo registrado.</td></tr>`;
     return;
   }
 
@@ -127,30 +127,30 @@ function renderEmprestimos(list) {
 
     let statusTag = '';
     if (isDevolvido) {
-      statusTag = `<span class="tag tag-muted">DEVOLVIDO (${formatDate(item.dataDevolucao)})</span>`;
+      statusTag = `<span class="badge badge-neutral">Devolvido (${formatDate(item.dataDevolucao)})</span>`;
     } else if (isAtrasado) {
-      statusTag = `<span class="tag tag-alert">[ATRASADO]</span>`;
+      statusTag = `<span class="badge badge-danger">&bull; Em Atraso</span>`;
     } else {
-      statusTag = `<span class="tag tag-default">EM ANDAMENTO</span>`;
+      statusTag = `<span class="badge badge-primary">&bull; Em Aberto</span>`;
     }
 
     const actionMarkup = !isDevolvido
-      ? `<button class="btn btn-light btn-compact" onclick="devolverEmprestimo(${item.id})">Devolver</button>`
-      : `<span style="color:var(--gray-400);font-family:var(--font-mono);font-size:11px;">Finalizado</span>`;
+      ? `<button class="btn btn-secondary btn-compact" onclick="devolverEmprestimo(${item.id})">Devolver</button>`
+      : `<span style="color:var(--gray-400);font-size:12px;font-weight:500;">Concluído</span>`;
 
     return `
       <tr>
         <td><code>#${item.id}</code></td>
         <td>
-          <div style="font-weight:600">${escapeHtml(item.equipamento?.nome || '—')}</div>
-          <small style="color:var(--gray-600);font-family:var(--font-mono);font-size:11px;">Patr: ${escapeHtml(item.equipamento?.patrimonio || '—')}</small>
+          <div style="font-weight:600;color:var(--gray-900);">${escapeHtml(item.equipamento?.nome || '—')}</div>
+          <small style="color:var(--gray-500);font-family:var(--font-mono);font-size:11px;">Patrimônio: ${escapeHtml(item.equipamento?.patrimonio || '—')}</small>
         </td>
         <td>
-          <div>${escapeHtml(item.colaborador?.nome || '—')}</div>
-          <small style="color:var(--gray-600);font-family:var(--font-mono);font-size:11px;">${escapeHtml(item.colaborador?.email || '')}</small>
+          <div style="font-weight:600;">${escapeHtml(item.colaborador?.nome || '—')}</div>
+          <small style="color:var(--gray-500);">${escapeHtml(item.colaborador?.email || '')}</small>
         </td>
-        <td style="font-family:var(--font-mono);font-size:12px;">${formatDate(item.dataEmprestimo)}</td>
-        <td style="font-family:var(--font-mono);font-size:12px;">${formatDate(item.dataPrevistaDevolucao)}</td>
+        <td style="font-family:var(--font-mono);">${formatDate(item.dataEmprestimo)}</td>
+        <td style="font-family:var(--font-mono);">${formatDate(item.dataPrevistaDevolucao)}</td>
         <td>${statusTag}</td>
         <td class="col-action">${actionMarkup}</td>
       </tr>
@@ -163,7 +163,7 @@ async function devolverEmprestimo(id) {
 
   try {
     await apiRequest(`/emprestimos/${id}/devolucao`, { method: 'PUT' });
-    showToast(`Empréstimo #${id} devolvido com sucesso.`);
+    showToast(`Empréstimo #${id} devolvido com sucesso!`);
     await loadAllData();
   } catch (err) {
     showToast(err.message, 'danger');
@@ -185,7 +185,7 @@ async function handleSalvarEmprestimo(e) {
       method: 'POST',
       body: JSON.stringify(payload)
     });
-    showToast('Empréstimo registrado com sucesso.');
+    showToast('Empréstimo registrado com sucesso!');
     closeModal('modal-emprestimo');
     await loadAllData();
   } catch (err) {
@@ -226,18 +226,18 @@ function renderEquipamentos(list) {
 
   tbody.innerHTML = list.map(item => {
     const situacaoTag = item.disponivel
-      ? `<span class="tag tag-default">DISPONÍVEL</span>`
-      : `<span class="tag tag-solid">EMPRESTADO</span>`;
+      ? `<span class="badge badge-success">&bull; Disponível</span>`
+      : `<span class="badge badge-warning">&bull; Emprestado</span>`;
 
     return `
       <tr>
         <td><code>${escapeHtml(item.patrimonio)}</code></td>
-        <td style="font-weight:600">${escapeHtml(item.nome)}</td>
-        <td><span class="tag tag-default">${escapeHtml(item.tipo)}</span></td>
+        <td style="font-weight:600;color:var(--gray-900);">${escapeHtml(item.nome)}</td>
+        <td><span class="badge badge-neutral">${escapeHtml(item.tipo)}</span></td>
         <td>${situacaoTag}</td>
         <td class="col-action">
           <button class="btn-link" onclick="editarEquipamento(${item.id})">Editar</button>
-          <button class="btn-link btn-link-danger" style="margin-left:10px;" onclick="excluirEquipamento(${item.id})">Excluir</button>
+          <button class="btn-link btn-link-danger" style="margin-left:8px;" onclick="excluirEquipamento(${item.id})">Excluir</button>
         </td>
       </tr>
     `;
@@ -249,7 +249,7 @@ function populateSelectEquipamentos() {
   if (!select) return;
 
   const disponiveis = state.equipamentos.filter(e => e.disponivel);
-  select.innerHTML = '<option value="">Selecione...</option>' +
+  select.innerHTML = '<option value="">Selecione um equipamento...</option>' +
     disponiveis.map(e => `<option value="${e.id}">${escapeHtml(e.patrimonio)} — ${escapeHtml(e.nome)} (${e.tipo})</option>`).join('');
 }
 
@@ -271,13 +271,13 @@ async function handleSalvarEquipamento(e) {
         method: 'PUT',
         body: JSON.stringify(payload)
       });
-      showToast('Equipamento atualizado.');
+      showToast('Equipamento atualizado com sucesso!');
     } else {
       await apiRequest('/equipamentos', {
         method: 'POST',
         body: JSON.stringify(payload)
       });
-      showToast('Equipamento cadastrado.');
+      showToast('Equipamento cadastrado com sucesso!');
     }
     closeModal('modal-equipamento');
     await loadEquipamentos();
@@ -336,18 +336,18 @@ function renderColaboradores(list) {
   }
 
   tbody.innerHTML = list.map(item => {
-    const endereco = [item.logradouro, item.numero, item.bairro, item.cidade, item.uf]
+    const endereco = [item.bairro, item.cidade, item.uf]
       .filter(Boolean)
       .join(', ');
 
     return `
       <tr>
-        <td style="font-weight:600">${escapeHtml(item.nome)}</td>
+        <td style="font-weight:600;color:var(--gray-900);">${escapeHtml(item.nome)}</td>
         <td><code>${escapeHtml(item.email)}</code></td>
-        <td><code style="font-size:11px;">${escapeHtml(item.cep)}</code></td>
-        <td style="color:var(--gray-700);">${escapeHtml(endereco || '—')}</td>
+        <td><span class="badge badge-neutral">${escapeHtml(item.cargo || 'Não informado')}</span></td>
+        <td style="color:var(--gray-600);">${escapeHtml(endereco || '—')}</td>
         <td class="col-action">
-          <button class="btn btn-light btn-compact" onclick="verHistoricoColaborador(${item.id}, '${escapeHtml(item.nome)}')">Histórico</button>
+          <button class="btn btn-secondary btn-compact" onclick="verHistoricoColaborador(${item.id}, '${escapeHtml(item.nome)}')">Histórico</button>
           <button class="btn-link" style="margin-left:8px;" onclick="editarColaborador(${item.id})">Editar</button>
           <button class="btn-link btn-link-danger" style="margin-left:8px;" onclick="excluirColaborador(${item.id})">Excluir</button>
         </td>
@@ -360,7 +360,7 @@ function populateSelectColaboradores() {
   const select = document.getElementById('select-colaborador');
   if (!select) return;
 
-  select.innerHTML = '<option value="">Selecione...</option>' +
+  select.innerHTML = '<option value="">Selecione o colaborador...</option>' +
     state.colaboradores.map(c => `<option value="${c.id}">${escapeHtml(c.nome)} (${escapeHtml(c.email)})</option>`).join('');
 }
 
@@ -375,12 +375,12 @@ async function handleSalvarColaborador(e) {
   const payload = {
     nome: document.getElementById('colaborador-nome').value.trim(),
     email: document.getElementById('colaborador-email').value.trim(),
-    cep: cepDigits,
-    numero: document.getElementById('colaborador-numero').value.trim(),
-    logradouro: document.getElementById('colaborador-logradouro').value.trim(),
-    bairro: document.getElementById('colaborador-bairro').value.trim(),
-    cidade: document.getElementById('colaborador-cidade').value.trim(),
-    uf: document.getElementById('colaborador-uf').value.trim().toUpperCase()
+    cargo: document.getElementById('colaborador-cargo').value.trim() || null,
+    cep: cepDigits || null,
+    numero: document.getElementById('colaborador-numero').value.trim() || null,
+    bairro: document.getElementById('colaborador-bairro').value.trim() || null,
+    cidade: document.getElementById('colaborador-cidade').value.trim() || null,
+    uf: document.getElementById('colaborador-uf').value.trim().toUpperCase() || null
   };
 
   try {
@@ -389,13 +389,13 @@ async function handleSalvarColaborador(e) {
         method: 'PUT',
         body: JSON.stringify(payload)
       });
-      showToast('Colaborador atualizado.');
+      showToast('Colaborador atualizado com sucesso!');
     } else {
       await apiRequest('/colaboradores', {
         method: 'POST',
         body: JSON.stringify(payload)
       });
-      showToast('Colaborador cadastrado.');
+      showToast('Colaborador cadastrado com sucesso!');
     }
     closeModal('modal-colaborador');
     await loadColaboradores();
@@ -413,12 +413,17 @@ function editarColaborador(id) {
   document.getElementById('colaborador-id').value = c.id;
   document.getElementById('colaborador-nome').value = c.nome;
   document.getElementById('colaborador-email').value = c.email;
-  document.getElementById('colaborador-cep').value = c.cep;
-  document.getElementById('colaborador-numero').value = c.numero;
-  document.getElementById('colaborador-logradouro').value = c.logradouro || '';
+  document.getElementById('colaborador-cargo').value = c.cargo || '';
+  document.getElementById('colaborador-cep').value = c.cep || '';
+  document.getElementById('colaborador-numero').value = c.numero || '';
   document.getElementById('colaborador-bairro').value = c.bairro || '';
   document.getElementById('colaborador-cidade').value = c.cidade || '';
   document.getElementById('colaborador-uf').value = c.uf || '';
+
+  // Se tiver algum dado de endereço, abre a sanfona
+  if (c.cep || c.numero || c.cidade) {
+    abrirEnderecoSection();
+  }
 
   document.getElementById('modal-colaborador-title').textContent = 'Editar Colaborador';
   openModal('modal-colaborador');
@@ -445,7 +450,7 @@ async function verHistoricoColaborador(id, nome) {
   try {
     const data = await apiRequest(`/colaboradores/${id}/emprestimos`);
     if (!data || !data.length) {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Nenhum empréstimo registrado.</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Nenhum empréstimo registrado para este colaborador.</td></tr>`;
       return;
     }
 
@@ -455,17 +460,17 @@ async function verHistoricoColaborador(id, nome) {
 
       let statusTag = '';
       if (isDevolvido) {
-        statusTag = `<span class="tag tag-muted">Devolvido</span>`;
+        statusTag = `<span class="badge badge-neutral">Devolvido</span>`;
       } else if (isAtrasado) {
-        statusTag = `<span class="tag tag-alert">[Atrasado]</span>`;
+        statusTag = `<span class="badge badge-danger">&bull; Atrasado</span>`;
       } else {
-        statusTag = `<span class="tag tag-default">Em andamento</span>`;
+        statusTag = `<span class="badge badge-primary">&bull; Em andamento</span>`;
       }
 
       return `
         <tr>
           <td><code>#${item.id}</code></td>
-          <td>${escapeHtml(item.equipamento?.nome || '—')} <small style="color:var(--gray-600);font-family:var(--font-mono);">(${escapeHtml(item.equipamento?.patrimonio || '')})</small></td>
+          <td><strong>${escapeHtml(item.equipamento?.nome || '—')}</strong> <small style="color:var(--gray-500);font-family:var(--font-mono);">(${escapeHtml(item.equipamento?.patrimonio || '')})</small></td>
           <td style="font-family:var(--font-mono);font-size:12px;">${formatDate(item.dataEmprestimo)}</td>
           <td style="font-family:var(--font-mono);font-size:12px;">${formatDate(item.dataPrevistaDevolucao)}</td>
           <td style="font-family:var(--font-mono);font-size:12px;">${item.dataDevolucao ? formatDate(item.dataDevolucao) : '—'}</td>
@@ -475,6 +480,22 @@ async function verHistoricoColaborador(id, nome) {
     }).join('');
   } catch (err) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">Erro: ${escapeHtml(err.message)}</td></tr>`;
+  }
+}
+
+function toggleEnderecoSection() {
+  const body = document.getElementById('endereco-fields');
+  const header = document.querySelector('.collapsible-header');
+  body.classList.toggle('open');
+  header.classList.toggle('open');
+}
+
+function abrirEnderecoSection() {
+  const body = document.getElementById('endereco-fields');
+  const header = document.querySelector('.collapsible-header');
+  if (body && !body.classList.contains('open')) {
+    body.classList.add('open');
+    header.classList.add('open');
   }
 }
 
@@ -495,7 +516,6 @@ async function buscarCep() {
       return;
     }
 
-    document.getElementById('colaborador-logradouro').value = data.logradouro || '';
     document.getElementById('colaborador-bairro').value = data.bairro || '';
     document.getElementById('colaborador-cidade').value = data.localidade || '';
     document.getElementById('colaborador-uf').value = data.uf || '';
@@ -519,6 +539,10 @@ function openModal(id) {
   if (id === 'modal-colaborador' && !document.getElementById('colaborador-id').value) {
     document.getElementById('form-colaborador').reset();
     document.getElementById('modal-colaborador-title').textContent = 'Novo Colaborador';
+    const body = document.getElementById('endereco-fields');
+    const header = document.querySelector('.collapsible-header');
+    if (body) body.classList.remove('open');
+    if (header) header.classList.remove('open');
   }
   if (id === 'modal-emprestimo') {
     document.getElementById('form-emprestimo').reset();
@@ -538,7 +562,7 @@ function closeModal(id) {
   }
 }
 
-// ================= Notificações Minimalistas =================
+// ================= Notificações Toast =================
 function showToast(message, type = 'info') {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -551,7 +575,8 @@ function showToast(message, type = 'info') {
 
   setTimeout(() => {
     toast.style.opacity = '0';
-    toast.style.transition = 'opacity 0.2s ease';
+    toast.style.transform = 'translateY(12px) scale(0.95)';
+    toast.style.transition = 'all 0.2s ease';
     setTimeout(() => toast.remove(), 200);
   }, 3500);
 }
